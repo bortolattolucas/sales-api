@@ -94,7 +94,6 @@ public class ProdutoServicoResource {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         produtoServicoService.delete(id);
-
         return ResponseEntity.noContent().build();
     }
 }

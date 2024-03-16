@@ -6,7 +6,6 @@ import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
 import br.com.bortolattolucas.salesapi.services.ProdutoServicoService;
 import br.com.bortolattolucas.salesapi.utils.PatcherUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -94,18 +93,11 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
     @Override
     public void delete(UUID id) {
         throwExceptionIfNotFound(id);
-
-        this.deleteById(id);
+        deleteById(id);
     }
 
     @Override
     public JpaRepository<ProdutoServico, UUID> getRepository() {
         return produtoServicoRepository;
-    }
-
-    private void throwExceptionIfNotFound(UUID id) {
-        if (!produtoServicoRepository.existsById(id)) {
-            throw new ObjectNotFoundException(id, "Not found");
-        }
     }
 }

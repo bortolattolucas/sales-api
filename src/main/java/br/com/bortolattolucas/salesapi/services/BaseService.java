@@ -18,4 +18,10 @@ public interface BaseService<T, ID> {
     default void deleteById(ID id) {
         getRepository().deleteById(id);
     }
+
+    default void throwExceptionIfNotFound(ID id) {
+        if (!getRepository().existsById(id)) {
+            throw new ObjectNotFoundException(id, "Not found");
+        }
+    }
 }
