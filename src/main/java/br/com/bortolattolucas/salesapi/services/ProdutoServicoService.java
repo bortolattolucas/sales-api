@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface ProdutoServicoService extends BaseService<ProdutoServico, UUID> {
     Page<ProdutoServico> findPage(int page, int size, String orderBy, String direction, String nome, Double preco,
                                   Double precoMinimo, Double precoMaximo, String descricao, String tipo, Boolean ativo);
-
     void update(UUID id, ProdutoServico entity);
     void updatePartial(UUID id, ProdutoServico entity);
+    void delete(UUID id);
 }

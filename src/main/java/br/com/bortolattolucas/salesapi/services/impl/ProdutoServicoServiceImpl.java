@@ -92,6 +92,13 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
     }
 
     @Override
+    public void delete(UUID id) {
+        throwExceptionIfNotFound(id);
+
+        this.deleteById(id);
+    }
+
+    @Override
     public JpaRepository<ProdutoServico, UUID> getRepository() {
         return produtoServicoRepository;
     }

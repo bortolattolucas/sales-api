@@ -14,4 +14,8 @@ public interface BaseService<T, ID> {
     default T findById(ID id) {
         return getRepository().findById(id).orElseThrow(() -> new ObjectNotFoundException(id, "Not found"));
     }
+
+    default void deleteById(ID id) {
+        getRepository().deleteById(id);
+    }
 }
