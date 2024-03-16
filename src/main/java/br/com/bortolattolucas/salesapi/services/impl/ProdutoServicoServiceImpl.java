@@ -4,6 +4,8 @@ import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
 import br.com.bortolattolucas.salesapi.domain.QProdutoServico;
 import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
 import br.com.bortolattolucas.salesapi.services.ProdutoServicoService;
+import br.com.bortolattolucas.salesapi.utils.PatcherUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,7 @@ import java.util.UUID;
 import static br.com.bortolattolucas.salesapi.utils.ValueUtils.isNull;
 import static br.com.bortolattolucas.salesapi.utils.ValueUtils.isNullOrEmpty;
 
+@Slf4j
 @Service
 public class ProdutoServicoServiceImpl implements ProdutoServicoService {
 
@@ -73,6 +76,19 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
 
         entity.setId(id);
         produtoServicoRepository.save(entity);
+    }
+
+    @Override
+    public void updatePartial(UUID id, ProdutoServico entity) {
+        ProdutoServico persisted = this.findById(id);
+
+        try {
+            PatcherUtils.patch(persisted, entity);
+        } catch (IllegalAccessException e) {
+            log.error("Error on patching ProdutoServico", e);
+        }
+
+        produtoServicoRepository.save(persisted);
     }
 
     @Override

@@ -10,4 +10,5 @@ public interface ProdutoServicoService extends BaseService<ProdutoServico, UUID>
                                   Double precoMinimo, Double precoMaximo, String descricao, String tipo, Boolean ativo);
 
     void update(UUID id, ProdutoServico entity);
+    void updatePartial(UUID id, ProdutoServico entity);
 }

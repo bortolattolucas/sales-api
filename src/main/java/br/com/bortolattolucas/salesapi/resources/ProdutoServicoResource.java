@@ -2,6 +2,7 @@ package br.com.bortolattolucas.salesapi.resources;
 
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
 import br.com.bortolattolucas.salesapi.dto.ProdutoServicoDto;
+import br.com.bortolattolucas.salesapi.dto.ProdutoServicoPatchDto;
 import br.com.bortolattolucas.salesapi.mapper.ProdutoServicoMapper;
 import br.com.bortolattolucas.salesapi.services.ProdutoServicoService;
 
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -76,6 +78,14 @@ public class ProdutoServicoResource {
     public ResponseEntity<Void> update(@PathVariable UUID id,
                                        @RequestBody @Valid ProdutoServicoDto produtoServicoDto) {
         produtoServicoService.update(id, ProdutoServicoMapper.toEntity(produtoServicoDto));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<Void> updatePartial(@PathVariable UUID id,
+                                              @RequestBody @Valid ProdutoServicoPatchDto produtoServicoPatchDto) {
+        produtoServicoService.updatePartial(id, ProdutoServicoMapper.toEntity(produtoServicoPatchDto));
 
         return ResponseEntity.noContent().build();
     }

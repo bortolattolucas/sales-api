@@ -26,8 +26,9 @@ public class ProdutoServico extends BaseDomain {
     @NotBlank
     private String nome;
 
+    @NotNull
     @Positive
-    private double preco;
+    private Double preco;
 
     private String descricao;
 
@@ -37,5 +38,5 @@ public class ProdutoServico extends BaseDomain {
 
     @NotNull
     @Builder.Default
-    private boolean ativo = true;
+    private Boolean ativo = true;
 }

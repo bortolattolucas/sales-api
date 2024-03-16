@@ -2,6 +2,7 @@ package br.com.bortolattolucas.salesapi.mapper;
 
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
 import br.com.bortolattolucas.salesapi.dto.ProdutoServicoDto;
+import br.com.bortolattolucas.salesapi.dto.ProdutoServicoPatchDto;
 import br.com.bortolattolucas.salesapi.enums.TipoRecurso;
 
 public class ProdutoServicoMapper {
@@ -16,6 +17,16 @@ public class ProdutoServicoMapper {
                 .build();
     }
 
+    public static ProdutoServico toEntity(ProdutoServicoPatchDto produtoServicoPatchDto) {
+        return ProdutoServico.builder()
+                .nome(produtoServicoPatchDto.getNome())
+                .preco(produtoServicoPatchDto.getPreco())
+                .descricao(produtoServicoPatchDto.getDescricao())
+                .tipo(TipoRecurso.fromDescricao(produtoServicoPatchDto.getTipo()))
+                .ativo(produtoServicoPatchDto.getAtivo())
+                .build();
+    }
+
     public static ProdutoServicoDto toDto(ProdutoServico produtoServico) {
         return ProdutoServicoDto.builder()
                 .id(produtoServico.getId().toString())
@@ -23,7 +34,7 @@ public class ProdutoServicoMapper {
                 .preco(produtoServico.getPreco())
                 .descricao(produtoServico.getDescricao())
                 .tipo(produtoServico.getTipo().getDescricao())
-                .ativo(produtoServico.isAtivo())
+                .ativo(produtoServico.getAtivo())
                 .build();
     }
 }

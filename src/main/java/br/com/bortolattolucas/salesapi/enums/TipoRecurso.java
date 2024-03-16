@@ -19,6 +19,7 @@ public enum TipoRecurso {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException("Tipo de recurso inválido");
+
+        return null;
     }
 }
