@@ -71,9 +71,11 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
 
     @Override
     public void update(UUID id, ProdutoServico entity) {
-        throwExceptionIfNotFound(id);
+        ProdutoServico persisted = this.findById(id);
 
         entity.setId(id);
+        entity.setCreatedAt(persisted.getCreatedAt());
+
         produtoServicoRepository.save(entity);
     }
 

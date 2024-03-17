@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import static br.com.bortolattolucas.salesapi.enums.TipoRecurso.PRODUTO;
+import static br.com.bortolattolucas.salesapi.enums.TipoRecurso.SERVICO;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -45,4 +48,12 @@ public class ItemPedido extends BaseDomain {
     @Positive
     @Column(name = "valor_total")
     private Double valorTotal;
+
+    public boolean isProduto() {
+        return this.produtoServico.getTipo().equals(PRODUTO);
+    }
+
+    public boolean isServico() {
+        return this.produtoServico.getTipo().equals(SERVICO);
+    }
 }

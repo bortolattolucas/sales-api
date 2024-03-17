@@ -1,5 +1,6 @@
 package br.com.bortolattolucas.salesapi.resources.exception;
 
+import br.com.bortolattolucas.salesapi.services.exceptions.DataIntegrityException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.hibernate.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -51,7 +52,7 @@ public class ResourceExceptionHandler {
     }
 
     @ExceptionHandler(ObjectNotFoundException.class)
-    public ResponseEntity<Error> objectNotFound(ObjectNotFoundException e, HttpServletRequest request) {
+    public ResponseEntity<Error> handleObjectNotFound(ObjectNotFoundException e, HttpServletRequest request) {
         Map<String, String> fieldErrors = new HashMap<>();
         fieldErrors.put("id", e.getIdentifier().toString());
 
@@ -63,5 +64,17 @@ public class ResourceExceptionHandler {
                 .build();
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(DataIntegrityException.class)
+    public ResponseEntity<Error> handleStateConflict(DataIntegrityException e, HttpServletRequest request) {
+        Error error = Error.builder()
+                .message(e.getMessage())
+                .fields(e.getFieldErrors())
+                .timestamp(LocalDateTime.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }

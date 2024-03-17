@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,12 +16,14 @@ import lombok.experimental.SuperBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @Entity
 public class Pedido extends BaseDomain {
 
@@ -61,4 +64,16 @@ public class Pedido extends BaseDomain {
     @NotNull
     @Builder.Default
     private Boolean aberto = true;
+
+    public UUID[] getItensIds() {
+        return this.getItens()
+                .stream()
+                .map(itemPedido ->
+                        itemPedido.getProdutoServico().getId()
+                ).toArray(UUID[]::new);
+    }
+
+    public void mapearItens() {
+        this.getItens().forEach(itemPedido -> itemPedido.setPedido(this));
+    }
 }

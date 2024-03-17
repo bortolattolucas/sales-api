@@ -13,7 +13,7 @@ public class ProdutoServicoMapper {
                 .preco(produtoServicoDto.getPreco())
                 .descricao(produtoServicoDto.getDescricao())
                 .tipo(TipoRecurso.fromDescricao(produtoServicoDto.getTipo()))
-                .ativo(produtoServicoDto.isAtivo())
+                .ativo(produtoServicoDto.getAtivo() != null ? produtoServicoDto.getAtivo() : true)
                 .build();
     }
 

@@ -28,6 +28,5 @@ public class ProdutoServicoDto {
     @Pattern(regexp = "PRODUTO|SERVICO", message = "Deve ser PRODUTO ou SERVICO")
     private String tipo;
 
-    @Builder.Default
-    private boolean ativo = true;
+    private Boolean ativo;
 }
