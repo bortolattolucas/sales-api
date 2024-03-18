@@ -6,6 +6,8 @@ import br.com.bortolattolucas.salesapi.dto.PedidoDto;
 import br.com.bortolattolucas.salesapi.dto.PedidoPatchDto;
 import br.com.bortolattolucas.salesapi.mapper.PedidoMapper;
 import br.com.bortolattolucas.salesapi.services.PedidoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "Pedidos", description = "API de Pedidos")
 @RequestMapping(value = "/pedidos")
 public class PedidoResource {
 
@@ -37,6 +40,7 @@ public class PedidoResource {
         this.pedidoService = pedidoService;
     }
 
+    @Operation(summary = "Cria um novo Pedido")
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody(required = false) PedidoDto pedidoDto) {
         Pedido pedido = pedidoService.save(PedidoMapper.toEntity(pedidoDto));
@@ -47,6 +51,7 @@ public class PedidoResource {
         return ResponseEntity.created(uri).build();
     }
 
+    @Operation(summary = "Busca um Pedido pelo ID")
     @Transactional
     @GetMapping(value = "/{id}")
     public ResponseEntity<PedidoDto> read(@PathVariable String id) {
@@ -56,6 +61,7 @@ public class PedidoResource {
         return ResponseEntity.ok().body(pedidoDto);
     }
 
+    @Operation(summary = "Lista os Pedidos paginados com filtros opcionais")
     @Transactional
     @GetMapping
     public ResponseEntity<Page<PedidoDto>> list(
@@ -77,6 +83,7 @@ public class PedidoResource {
         return ResponseEntity.ok().body(pedidosPage.map(PedidoMapper::toDto));
     }
 
+    @Operation(summary = "Adiciona um Item ao Pedido pelo ID")
     @PostMapping(value = "/{id}/itens")
     public ResponseEntity<Void> adicionarItem(@PathVariable UUID id,
                                               @RequestBody ItemPedidoDto itemPedidoDto) {
@@ -84,12 +91,14 @@ public class PedidoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Fecha um Pedido pelo ID")
     @PatchMapping(value = "/{id}/fechar")
     public ResponseEntity<Void> fecharPedido(@PathVariable UUID id) {
         pedidoService.fecharPedido(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Altera a porcentagem de desconto dos produtos de um Pedido pelo ID")
     @PatchMapping(value = "/{id}/desconto-produtos")
     public ResponseEntity<Void> alterarDescontoProdutos(@PathVariable UUID id,
                                                         @RequestBody @Valid PedidoPatchDto pedidoPatchDto) {
@@ -97,12 +106,14 @@ public class PedidoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Deleta um Pedido pelo ID")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         pedidoService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Remove um Item do Pedido pelo ID do Pedido e ID do Produto/Serviço")
     @DeleteMapping(value = "/{id}/itens/{idProdutoServico}")
     public ResponseEntity<Void> deleteItem(@PathVariable UUID id,
                                            @PathVariable UUID idProdutoServico) {

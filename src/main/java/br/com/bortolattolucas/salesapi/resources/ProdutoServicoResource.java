@@ -6,6 +6,8 @@ import br.com.bortolattolucas.salesapi.dto.ProdutoServicoPatchDto;
 import br.com.bortolattolucas.salesapi.mapper.ProdutoServicoMapper;
 import br.com.bortolattolucas.salesapi.services.ProdutoServicoService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
+@Tag(name = "Produto/Serviço", description = "API de Produtos/Serviços")
 @RequestMapping(value = "/produtos-servicos")
 public class ProdutoServicoResource {
 
@@ -37,6 +40,7 @@ public class ProdutoServicoResource {
         this.produtoServicoService = produtoServicoService;
     }
 
+    @Operation(summary = "Cria um novo Produto/Serviço")
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody @Valid ProdutoServicoDto produtoServicoDto) {
         ProdutoServico produtoServico = produtoServicoService.save(ProdutoServicoMapper.toEntity(produtoServicoDto));
@@ -47,6 +51,7 @@ public class ProdutoServicoResource {
         return ResponseEntity.created(uri).build();
     }
 
+    @Operation(summary = "Busca um Produto/Serviço pelo ID")
     @GetMapping(value = "/{id}")
     public ResponseEntity<ProdutoServicoDto> read(@PathVariable String id) {
         ProdutoServicoDto produtoServicoDto =
@@ -55,6 +60,7 @@ public class ProdutoServicoResource {
         return ResponseEntity.ok().body(produtoServicoDto);
     }
 
+    @Operation(summary = "Lista os Produtos/Serviços paginados com filtros opcionais")
     @GetMapping
     public ResponseEntity<Page<ProdutoServicoDto>> list(
             @RequestParam(name = "page", defaultValue = "0") int page,
@@ -75,6 +81,7 @@ public class ProdutoServicoResource {
         return ResponseEntity.ok().body(produtosServicosPage.map(ProdutoServicoMapper::toDto));
     }
 
+    @Operation(summary = "Atualiza um Produto/Serviço pelo ID")
     @PutMapping(value = "/{id}")
     public ResponseEntity<Void> update(@PathVariable UUID id,
                                        @RequestBody @Valid ProdutoServicoDto produtoServicoDto) {
@@ -83,6 +90,7 @@ public class ProdutoServicoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Atualiza parcialmente um Produto/Serviço pelo ID")
     @PatchMapping(value = "/{id}")
     public ResponseEntity<Void> updatePartial(@PathVariable UUID id,
                                               @RequestBody @Valid ProdutoServicoPatchDto produtoServicoPatchDto) {
@@ -91,6 +99,7 @@ public class ProdutoServicoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Deleta um Produto/Serviço pelo ID")
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         produtoServicoService.delete(id);
