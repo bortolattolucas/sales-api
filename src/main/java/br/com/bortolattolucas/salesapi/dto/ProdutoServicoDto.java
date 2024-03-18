@@ -16,15 +16,16 @@ public class ProdutoServicoDto {
     private String id;
 
     @NotEmpty(message = "Não pode ser vazio")
+    @Pattern(regexp = "^(?=.*\\S).*$", message = "Não pode ser vazio")
     private String nome;
 
-    @NotNull(message = "Não pode ser nulo")
+    @NotNull(message = "Não pode ser vazio")
     @Positive(message = "Deve ser um valor positivo")
     private Double preco;
 
     private String descricao;
 
-    @NotNull(message = "Não pode ser nulo")
+    @NotNull(message = "Não pode ser vazio")
     @Pattern(regexp = "PRODUTO|SERVICO", message = "Deve ser PRODUTO ou SERVICO")
     private String tipo;
 
