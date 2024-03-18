@@ -76,4 +76,11 @@ public class Pedido extends BaseDomain {
     public void mapearItens() {
         this.getItens().forEach(itemPedido -> itemPedido.setPedido(this));
     }
+
+    public boolean possuiProdutoServico(UUID produtoServicoId) {
+        return this.getItens().stream()
+                .anyMatch(itemPedido ->
+                        itemPedido.getProdutoServico().getId()
+                                .equals(produtoServicoId));
+    }
 }

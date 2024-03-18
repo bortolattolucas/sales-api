@@ -15,6 +15,16 @@ public class ItemPedidoDto {
     @NotNull(message = "Não pode ser nulo")
     private UUID produtoServicoId;
 
+    private String produtoServicoNome;
+
+    private String produtoServicoDescricao;
+
+    private String produtoServicoTipo;
+
     @NotNull(message = "Não pode ser nulo")
     private Double quantidade;
+
+    private Double valorUnitario;
+
+    private Double valorTotal;
 }

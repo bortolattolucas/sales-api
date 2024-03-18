@@ -3,6 +3,7 @@ package br.com.bortolattolucas.salesapi.services.impl;
 import br.com.bortolattolucas.salesapi.domain.ItemPedido;
 import br.com.bortolattolucas.salesapi.domain.Pedido;
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
+import br.com.bortolattolucas.salesapi.domain.QPedido;
 import br.com.bortolattolucas.salesapi.domain.QProdutoServico;
 import br.com.bortolattolucas.salesapi.repositories.PedidoRepository;
 import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
@@ -10,10 +11,14 @@ import br.com.bortolattolucas.salesapi.services.PedidoService;
 import br.com.bortolattolucas.salesapi.services.exceptions.DataIntegrityException;
 import com.querydsl.core.BooleanBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -105,6 +110,79 @@ public class PedidoServiceImpl implements PedidoService {
                 : pedido.getValorOriginalProdutos());
 
         pedido.setValorTotal(pedido.getValorTotalProdutos() + pedido.getValorTotalServicos());
+    }
+
+    @Override
+    public Page<Pedido> findPage(int page, int size, String orderBy, String direction, Double valorTotal,
+                                 Double valorTotalMinimo, Double valorTotalMaximo, Boolean aberto,
+                                 LocalDateTime createdAt, LocalDateTime createdAtMin, LocalDateTime createdAtMax) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        if (valorTotal != null) {
+            booleanBuilder.and(QPedido.pedido.valorTotal.eq(valorTotal));
+        }
+
+        if (valorTotalMinimo != null) {
+            booleanBuilder.and(QPedido.pedido.valorTotal.goe(valorTotalMinimo));
+        }
+
+        if (valorTotalMaximo != null) {
+            booleanBuilder.and(QPedido.pedido.valorTotal.loe(valorTotalMaximo));
+        }
+
+        if (aberto != null) {
+            booleanBuilder.and(QPedido.pedido.aberto.eq(aberto));
+        }
+
+        if (createdAt != null) {
+            booleanBuilder.and(QPedido.pedido.createdAt.eq(createdAt));
+        }
+
+        if (createdAtMin != null) {
+            booleanBuilder.and(QPedido.pedido.createdAt.goe(createdAtMin));
+        }
+
+        if (createdAtMax != null) {
+            booleanBuilder.and(QPedido.pedido.createdAt.loe(createdAtMax));
+        }
+
+        return pedidoRepository.findAll(booleanBuilder, PageRequest.of(page, size,
+                Sort.Direction.valueOf(direction), orderBy));
+    }
+
+    @Override
+    public void fecharPedido(UUID id) {
+        Pedido pedido = findById(id);
+
+        if (!pedido.getAberto()) {
+            throw new DataIntegrityException("Não é possível fechar pedidos que não estejam abertos", Map.of(
+                    pedido.getId().toString(), "Pedido fechado"
+            ));
+        }
+
+        pedido.setAberto(false);
+        getRepository().save(pedido);
+    }
+
+    @Override
+    public void adicionarItem(UUID id, ItemPedido item) {
+        Pedido pedido = findById(id);
+
+        if (!pedido.getAberto()) {
+            throw new DataIntegrityException("Não é possível adicionar itens a pedidos que não estejam abertos", Map.of(
+                    pedido.getId().toString(), "Pedido fechado"
+            ));
+        }
+
+        if (pedido.possuiProdutoServico(item.getProdutoServico().getId())) {
+            throw new DataIntegrityException("Não é possível adicionar o mesmo item mais de uma vez", Map.of(
+                    item.getProdutoServico().getId().toString(), "Item já adicionado ao pedido"
+            ));
+        }
+
+        pedido.getItens().add(item);
+        configurarPedido(pedido);
+        getRepository().save(pedido);
     }
 
     @Override
