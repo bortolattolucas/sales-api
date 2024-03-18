@@ -3,8 +3,10 @@ package br.com.bortolattolucas.salesapi.resources;
 import br.com.bortolattolucas.salesapi.domain.Pedido;
 import br.com.bortolattolucas.salesapi.dto.ItemPedidoDto;
 import br.com.bortolattolucas.salesapi.dto.PedidoDto;
+import br.com.bortolattolucas.salesapi.dto.PedidoPatchDto;
 import br.com.bortolattolucas.salesapi.mapper.PedidoMapper;
 import br.com.bortolattolucas.salesapi.services.PedidoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -88,9 +90,23 @@ public class PedidoResource {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping(value = "/{id}/desconto-produtos")
+    public ResponseEntity<Void> alterarDescontoProdutos(@PathVariable UUID id,
+                                                        @RequestBody @Valid PedidoPatchDto pedidoPatchDto) {
+        pedidoService.alterarDescontoProdutos(id, pedidoPatchDto.getPrcDescontoProdutos());
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         pedidoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping(value = "/{id}/itens/{idProdutoServico}")
+    public ResponseEntity<Void> deleteItem(@PathVariable UUID id,
+                                           @PathVariable UUID idProdutoServico) {
+        pedidoService.deleteItem(id, idProdutoServico);
         return ResponseEntity.noContent().build();
     }
 }

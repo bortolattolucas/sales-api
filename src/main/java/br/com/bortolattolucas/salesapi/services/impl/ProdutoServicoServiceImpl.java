@@ -2,8 +2,10 @@ package br.com.bortolattolucas.salesapi.services.impl;
 
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
 import br.com.bortolattolucas.salesapi.domain.QProdutoServico;
+import br.com.bortolattolucas.salesapi.repositories.ItemPedidoRepository;
 import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
 import br.com.bortolattolucas.salesapi.services.ProdutoServicoService;
+import br.com.bortolattolucas.salesapi.services.exceptions.DataIntegrityException;
 import br.com.bortolattolucas.salesapi.utils.PatcherUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import com.querydsl.core.BooleanBuilder;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static br.com.bortolattolucas.salesapi.utils.ValueUtils.isNull;
@@ -25,10 +28,13 @@ import static br.com.bortolattolucas.salesapi.utils.ValueUtils.isNullOrEmpty;
 public class ProdutoServicoServiceImpl implements ProdutoServicoService {
 
     private final ProdutoServicoRepository produtoServicoRepository;
+    private final ItemPedidoRepository itemPedidoRepository;
 
     @Autowired
-    public ProdutoServicoServiceImpl(ProdutoServicoRepository produtoServicoRepository) {
+    public ProdutoServicoServiceImpl(ProdutoServicoRepository produtoServicoRepository,
+                                     ItemPedidoRepository itemPedidoRepository) {
         this.produtoServicoRepository = produtoServicoRepository;
+        this.itemPedidoRepository = itemPedidoRepository;
     }
 
     @Override
@@ -95,7 +101,19 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
     @Override
     public void delete(UUID id) {
         throwExceptionIfNotFound(id);
+        throwExceptionIfHasItemPedido(id);
         deleteById(id);
+    }
+
+    private void throwExceptionIfHasItemPedido(UUID id) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder()
+                .and(QProdutoServico.produtoServico.id.eq(id));
+
+        if (itemPedidoRepository.exists(booleanBuilder)) {
+            throw new DataIntegrityException("Não é permitido excluir produtos associados a pedidos", Map.of(
+                    id.toString(), "Produto está associado a um pedido existente"
+            ));
+        }
     }
 
     @Override

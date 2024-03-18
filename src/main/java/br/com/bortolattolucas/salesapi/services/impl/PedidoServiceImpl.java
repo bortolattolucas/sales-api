@@ -175,12 +175,44 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         if (pedido.possuiProdutoServico(item.getProdutoServico().getId())) {
-            throw new DataIntegrityException("Não é possível adicionar o mesmo item mais de uma vez", Map.of(
-                    item.getProdutoServico().getId().toString(), "Item já adicionado ao pedido"
-            ));
+            throw new DataIntegrityException("Não é possível adicionar o mesmo item mais de uma vez",
+                    Map.of(item.getProdutoServico().getId().toString(), "Item já adicionado ao pedido"));
         }
 
         pedido.getItens().add(item);
+        configurarPedido(pedido);
+        getRepository().save(pedido);
+    }
+
+    @Override
+    public void alterarDescontoProdutos(UUID id, Double prcDescontoProdutos) {
+        Pedido pedido = findById(id);
+
+        if (!pedido.getAberto()) {
+            throw new DataIntegrityException("Não é possível alterar o desconto de produtos em pedidos fechados",
+                    Map.of(pedido.getId().toString(), "Pedido fechado"));
+        }
+
+        pedido.setPrcDescontoProdutos(prcDescontoProdutos);
+        configurarPedido(pedido);
+        getRepository().save(pedido);
+    }
+
+    @Transactional
+    @Override
+    public void deleteItem(UUID id, UUID idProdutoServico) {
+        Pedido pedido = findById(id);
+
+        if (!pedido.getAberto()) {
+            throw new DataIntegrityException("Não é possível remover itens de pedidos fechados",
+                    Map.of(pedido.getId().toString(), "Pedido fechado"));
+        }
+
+        if (!pedido.getItens().removeIf(item -> item.getProdutoServico().getId().equals(idProdutoServico))) {
+            throw new DataIntegrityException("Não é possível remover itens inexistentes de um pedido",
+                    Map.of(idProdutoServico.toString(), "Produto/Serviço não encontrado no pedido"));
+        }
+
         configurarPedido(pedido);
         getRepository().save(pedido);
     }

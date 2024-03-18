@@ -17,4 +17,8 @@ public interface PedidoService extends BaseService<Pedido, UUID> {
     void fecharPedido(UUID id);
 
     void adicionarItem(UUID id, ItemPedido entity);
+
+    void alterarDescontoProdutos(UUID id, Double prcDescontoProdutos);
+
+    void deleteItem(UUID id, UUID idProdutoServico);
 }
