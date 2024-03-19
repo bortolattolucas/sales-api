@@ -15,6 +15,17 @@ public class TestObjectsUtil {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
+    public static ProdutoServico getServicoAtivo30Reais() {
+        return ProdutoServico.builder()
+                .id(UUID.fromString("f01909be-9acb-4677-9777-728428717690"))
+                .nome("Serviço 1")
+                .preco(30.0)
+                .descricao("Descrição do serviço 1")
+                .tipo(TipoRecurso.SERVICO)
+                .ativo(true)
+                .build();
+    }
+
     public static ProdutoServico getServicoInativo20Reais() {
         return ProdutoServico.builder()
                 .id(UUID.fromString("f01909be-9acb-4677-9777-728428717690"))

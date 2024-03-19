@@ -43,8 +43,6 @@ public class PedidoServiceImpl implements PedidoService {
     @Override
     @Transactional
     public Pedido save(Pedido pedido) {
-        pedido.mapearItens();
-
         if (!pedido.getItens().isEmpty()) {
             configurarPedido(pedido);
         }
@@ -53,11 +51,13 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     private void configurarPedido(Pedido pedido) {
-        Iterable<ProdutoServico> itens = buscarItensAdicionados(pedido);
+        pedido.mapearItens();
 
-        validarAusenciaItensInativos(itens);
+        Iterable<ProdutoServico> produtoServicos = buscarItensAdicionados(pedido);
 
-        configurarValoresItens(pedido, itens);
+        validarAusenciaItensInativos(produtoServicos);
+
+        configurarValoresItens(pedido, produtoServicos);
         configurarValoresPedido(pedido);
     }
 
@@ -76,7 +76,7 @@ public class PedidoServiceImpl implements PedidoService {
         if (!itensInativos.isEmpty()) {
             Map<String, String> idsInativos = new HashMap<>();
             itensInativos.forEach(item -> idsInativos.put(item.getId().toString(), "Produto/Serviço inativo"));
-            throw new DataIntegrityException("Não é possível criar pedidos itens inativos.", idsInativos);
+            throw new DataIntegrityException("Um pedido não pode ter itens inativos.", idsInativos);
         }
     }
 
@@ -165,6 +165,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
+    @Transactional
     public void adicionarItem(UUID id, ItemPedido item) {
         Pedido pedido = findById(id);
 
@@ -180,7 +181,14 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.getItens().add(item);
-        configurarPedido(pedido);
+
+        try {
+            configurarPedido(pedido);
+        } catch (DataIntegrityException e) {
+            pedido.getItens().remove(item);
+            throw e;
+        }
+
         getRepository().save(pedido);
     }
 

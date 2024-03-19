@@ -1,6 +1,7 @@
 package br.com.bortolattolucas.salesapi.services.impl;
 
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
+import br.com.bortolattolucas.salesapi.domain.QItemPedido;
 import br.com.bortolattolucas.salesapi.domain.QProdutoServico;
 import br.com.bortolattolucas.salesapi.repositories.ItemPedidoRepository;
 import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
@@ -107,7 +108,7 @@ public class ProdutoServicoServiceImpl implements ProdutoServicoService {
 
     private void throwExceptionIfHasItemPedido(UUID id) {
         BooleanBuilder booleanBuilder = new BooleanBuilder()
-                .and(QProdutoServico.produtoServico.id.eq(id));
+                .and(QItemPedido.itemPedido.produtoServico.id.eq(id));
 
         if (itemPedidoRepository.exists(booleanBuilder)) {
             throw new DataIntegrityException("Não é permitido excluir produtos associados a pedidos", Map.of(

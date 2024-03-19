@@ -1,7 +1,10 @@
 package br.com.bortolattolucas.salesapi.services;
 
+import br.com.bortolattolucas.salesapi.domain.ItemPedido;
+import br.com.bortolattolucas.salesapi.domain.Pedido;
 import br.com.bortolattolucas.salesapi.domain.ProdutoServico;
 import br.com.bortolattolucas.salesapi.repositories.ProdutoServicoRepository;
+import br.com.bortolattolucas.salesapi.services.exceptions.DataIntegrityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,7 @@ import static br.com.bortolattolucas.salesapi.TestObjectsUtil.getProdutoAtivo10R
 import static br.com.bortolattolucas.salesapi.TestObjectsUtil.getServicoInativo20Reais;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @ActiveProfiles(value = "test")
@@ -28,6 +32,9 @@ public class ProdutoServicoServiceIntegrationTest {
 
     @Autowired
     private ProdutoServicoRepository produtoServicoRepository;
+
+    @Autowired
+    private PedidoService pedidoService;
 
     private UUID produtoAtivoId;
     private UUID servicoInativoId;
@@ -69,5 +76,31 @@ public class ProdutoServicoServiceIntegrationTest {
     public void deleteShouldRemoveResourceWhenIdExists() {
         produtoServicoService.delete(produtoAtivoId);
         assertEquals(1, produtoServicoRepository.count());
+    }
+
+    @Test
+    @DisplayName("Não deve excluír um produto/serviço quando o mesmo estiver em um pedido")
+    public void deleteShouldDoNothingWhenResourceInUse() {
+        UUID pedidoId = this.pedidoService.save(Pedido.builder().build()).getId();
+        ProdutoServico produtoAtivo = this.produtoServicoService.save(getProdutoAtivo10Reais());
+
+        this.pedidoService.adicionarItem(pedidoId, ItemPedido.builder()
+                .produtoServico(produtoAtivo)
+                .quantidade(1.0)
+                .build());
+
+        Exception exception = assertThrows(DataIntegrityException.class, () ->
+                produtoServicoService.delete(produtoAtivo.getId())
+        );
+
+        assertEquals("Não é permitido excluir produtos associados a pedidos", exception.getMessage());
+
+        Pedido pedido = this.pedidoService.findById(pedidoId);
+        assertEquals(1, pedido.getItens().size());
+        assertEquals(produtoAtivo, pedido.getItens().iterator().next().getProdutoServico());
+
+        ProdutoServico produtoServico = this.produtoServicoService.findById(produtoAtivo.getId());
+        assertNotNull(produtoServico);
+        assertEquals(produtoAtivo, produtoServico);
     }
 }

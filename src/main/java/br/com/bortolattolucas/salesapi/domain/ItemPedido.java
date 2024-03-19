@@ -8,7 +8,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -40,14 +42,16 @@ public class ItemPedido extends BaseDomain {
     private Double quantidade;
 
     @NotNull
-    @Positive
+    @PositiveOrZero
+    @Builder.Default
     @Column(name = "valor_unitario")
-    private Double valorUnitario;
+    private Double valorUnitario = 0.0;
 
     @NotNull
-    @Positive
+    @PositiveOrZero
+    @Builder.Default
     @Column(name = "valor_total")
-    private Double valorTotal;
+    private Double valorTotal = 0.0;
 
     public boolean isProduto() {
         return this.produtoServico.getTipo().equals(PRODUTO);
